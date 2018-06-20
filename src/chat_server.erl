@@ -1,6 +1,6 @@
 -module(chat_server).
 -import(lib_chan_mm, [send/2, controller/2]).
--imporT(lists, [delete/2, foreach/2, map/2, member/2, reverse/2]).
+-import(lists, [delete/2, foreach/2, map/2, member/2, reverse/2]).
 
 -compile(export_all).
 
