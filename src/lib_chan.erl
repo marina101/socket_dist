@@ -10,20 +10,20 @@ start_server() ->
     case os:getenv("HOME") of
         false ->
             exit({ebadEnv, "HOME"});
-        HOME ->
+        Home->
             start_server(Home ++ "/.erlang_config/lib_chan.conf")
     end.
 
-start_server(Config) ->
+start_server(ConfigFile) ->
     io:format("lib_chan starting:~p~n", [ConfigFile]),
     case file:consult(ConfigFile) of
-        {ok, ConfigData} ->
-            io:format("ConfigData=~p~n", [ConfigData])
-            case check_terms(ConfigData) of
+        {ok, ConfigFile} ->
+            io:format("ConfigData=~p~n", [ConfigFile]),
+            case check_terms(ConfigFile) of
                 [] ->
-                    start_server1(ConfigData);
+                    start_server1(ConfigFile);
                 Errors ->
-                    exit({eDeamonConfig, Errors})
+                    exit({eDaemonConfig, Errors})
             end;
         {error, Why} ->
             exit({eDaemonConfig, Why})
@@ -49,7 +49,7 @@ start_server2(ConfigData) ->
 start_port_server(Port, ConfigData) ->
     lib_chan_cs:start_raw_server(Port,
                                  fun(Socket) ->
-                                    start_port_instance(Socket, ConifgData) end,
+                                    start_port_instance(Socket, ConfigData) end,
                                  100,
                                  4).
 
@@ -71,7 +71,7 @@ start_erl_port_server(MM, ConfigData) ->
                             send(MM, ack),
                             really_start(MM, ArgC, MFA);
                         _ ->
-                            co_authentication(Pwd, MM, ArgC, MFA)
+                            do_authentication(Pwd, MM, ArgC, MFA)
                     end;
                 no ->
                     io:format("sending bad service~n"),
@@ -137,7 +137,7 @@ connect(Host, Port, Service, Secret, ArgC) ->
                 ok      -> {ok, MM};
                 Error   -> Error
             end;
-        {MM, error} ->
+        {MM, Error} ->
             Error
     end.
 
@@ -195,15 +195,3 @@ rpc(MM, Q) ->
 
 cast(MM, Q) ->
     send(MM, Q).
-
-
-
-
-
-
-
-
-
-start_port_server(Port, ConfigData) ->
-    lib_chan_cs:start_raw_server( ..
-        fun(Socket)

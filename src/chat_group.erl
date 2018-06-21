@@ -8,7 +8,7 @@ start(C, Nick) ->
     process_flag(trap_exit, true),
     controller(C, self()),
     send(C, ack),
-    self() ! {chan, C {relay, Nick, "I'm starting the group"}},
+    self() ! {chan, C, {relay, Nick, "I'm starting the group"}},
     group_controller([{C, Nick}]).
 
 delete(Pid, [{Pid, Nick}|T], L) -> {Nick, reverse(T, L)};
@@ -20,7 +20,7 @@ group_controller([]) ->
 group_controller(L) ->
     receive
         {chan, C, {relay, Nick, Str}} ->
-            foreach(Fun({Pid, _}) -> send(Pid, {msg, Nick, C, Str}) end, L),
+            foreach(fun({Pid, _}) -> send(Pid, {msg, Nick, C, Str}) end, L),
             group_controller(L);
         {login, C, Nick} ->
             controller(C, self()),

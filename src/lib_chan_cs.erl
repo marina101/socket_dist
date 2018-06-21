@@ -1,5 +1,5 @@
 -module(lib_chan_cs).
--%% cs = client-server
+%% cs = client-server
 
 -export([start_raw_server/4, start_raw_client/3]).
 -export([stop/1]).
@@ -45,7 +45,7 @@ start_raw_server(Port, Fun, Max, PacketLength) ->
             {error, already_started}
     end.
 
-stop(Port) when integer(Port) ->
+stop(Port) when is_integer(Port) ->
     Name = port_name(Port),
     case whereis(Name) of 
         undefined ->
@@ -56,13 +56,13 @@ stop(Port) when integer(Port) ->
             stopped
     end.
 
-children(Port) when integer(Port) ->
+children(Port) when is_integer(Port) ->
     port_name(Port) ! {children, self()},
     receive
         {session_server, Reply} -> Reply
     end.
 
-port_name(Port) when integer(Port) ->
+port_name(Port) when is_integer(Port) ->
     list_to_atom("portServer" ++ integer_to_list(Port)).
 
 cold_start(Master, Port, Fun, Max, PacketLength) ->
@@ -104,12 +104,12 @@ socket_loop(Listen, New, Active, Fun, Max) ->
     end.
 
 possibly_start_another(New, Listen, Active, Fun, Max)
-    when pid(New) ->
+    when is_pid(New) ->
         socket_loop(Listen, New, Active, Fun, Max);
 possibly_start_another(false, Listen, Active, Fun, Max) ->
     case length(Active) of
         N when N < Max ->
-            New - start_Accept(Listen, Fun),
+            New = start_accept(Listen, Fun),
             socket_loop(Listen, New, Active, Fun, Max);
         _ ->
             socket_loop(Listen, false, Active, Fun, Max)
@@ -139,6 +139,6 @@ start_child(Parent, Listen, Fun) ->
                 _->
                     %% not an exit so. everything's ok
                     true
-            end.
+            end
     end.
-    
+

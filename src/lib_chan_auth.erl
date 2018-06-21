@@ -9,7 +9,7 @@ make_response(Challenge, Secret) ->
 
 is_response_correct(Challenge, Response, Secret) ->
     case lib_md5:string(Challenge ++ Secret) of
-        Response -> true
+        Response -> true;
         _        -> false
     end.
 

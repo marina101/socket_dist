@@ -18,13 +18,13 @@ test() ->
 connect(Host, Port, HostPsw, Group, Nick) ->
     spawn(fun() -> handler(Host, Port, HostPsw, Group, Nick) end).
 
-handler(Host, Port, HostPws, Group, Nick) ->
+handler(Host, Port, HostPsw, Group, Nick) ->
     process_flag(trap_exit, true),
     Widget = io_widget:start(self()),
     set_title(Widget, Nick),
     set_state(Widget, Nick),
     set_prompt(Widget, [Nick, " > "]),
-    set_handler(Widdget, fun parse_command/1),
+    set_handler(Widget, fun parse_command/1),
     start_connector(Host, Port, HostPsw),
     disconnected(Widget, Group, Nick).
 
@@ -78,14 +78,14 @@ try_to_connect(Parent, Host, Port, Pwd) ->
     %% Parent is the Pid of the process that spawned this process
     case lib_chan:connect(Host,Port, chat, Pwd, []) of
         {error, _Why} ->
-            Parent ! {status, {cannot, connect Host, Port}},
+            Parent ! {status, {cannot, connect, Host, Port}},
             sleep(2000),
             try_to_connect(Parent, Host, Port, Pwd);
         {ok, MM} ->
             lib_chan_mm:controller(MM, Parent),
-            Parent ! {Connected, MM},
+            Parent ! {connected, MM},
             exit(connectorFinished)
-    end
+    end.
 
 sleep(T) ->
     receive

@@ -8,7 +8,7 @@ start() ->
     start_server(),
     lib_chan:start_server("chat.conf").
 
-start_serveR() ->
+start_server() ->
     register(chat_server,
             spawn(fun() ->
                     process_flag(trap_exit, true),
@@ -26,7 +26,7 @@ server_loop(L) ->
                 error ->
                     Pid = spawn_link(fun() ->
                                         chat_group:start(Channel, Nick)
-                                    end).
+                                    end),
                     server_loop([{Group, Pid}|L])
             end;
         {mm_closed, _} ->
@@ -40,8 +40,8 @@ server_loop(L) ->
             server_loop(L)
     end.
 
-lookup(G, [{G,Pid}|T]) -> {ok, Pid};
-lookup(G, [H|T])       -> lookup(G,T);
+lookup(G, [{G,Pid}|_]) -> {ok, Pid};
+lookup(G, [_|T])       -> lookup(G,T);
 lookup(_, [])          -> error.
 
 remove_group(Pid, [{G,Pid}|T])  -> io:format("~p removed~n", [G]), T;

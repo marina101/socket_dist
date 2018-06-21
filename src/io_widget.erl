@@ -9,7 +9,7 @@
 
 start(Pid) ->
     gs:start(),
-    spawn_link(fund() -> widget(Pid) end).
+    spawn_link(fun() -> widget(Pid) end).
 
 get_state(Pid)          -> rpc(Pid, get_state).
 set_title(Pid, Str)     -> Pid ! {title, Str}.
@@ -32,13 +32,13 @@ widget(Pid) ->
                     [{map,true}, {configure, true}, {title, "window"} | Size]),
     gs:frame(packer, Win, [{packer_x, [{stretch, 1, 500}]},
                            {packer_y, [{stretch, 10, 100, 120},
-                                        {stretch, 1, 15, 15,}]}]),
+                                        {stretch, 1, 15, 15}]}]),
     gs:create(editor, editor, packer, [{pack_x, 1}, {pack_y, 1}, {vscroll, right}]),
     gs:create(entry, entry, packer, [{pack_x,1}, {pack_y, 2}, {keypress, true}]),
     gs:config(packer, Size),
     Prompt = "> ",
     State = nil,
-    gs:config(entry, {insert,{O.Promot}}),
+    gs:config(entry, {insert,{0, Prompt}}),
     loop(Win, Pid, Prompt, State, fun parse/1).
 
 loop(Win, Pid, Prompt, State, Parse) ->
@@ -116,4 +116,4 @@ loop(W) ->
     end.
 
 parse(Str) ->
-    {str, Str}
+    {str, Str}.
