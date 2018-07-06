@@ -17,11 +17,11 @@ start_server() ->
 start_server(ConfigFile) ->
     io:format("lib_chan starting:~p~n", [ConfigFile]),
     case file:consult(ConfigFile) of
-        {ok, ConfigFile} ->
-            io:format("ConfigData=~p~n", [ConfigFile]),
-            case check_terms(ConfigFile) of
+        {ok, ConfigData} ->
+            io:format("ConfigData=~p~n", [ConfigData]),
+            case check_terms(ConfigData) of
                 [] ->
-                    start_server1(ConfigFile);
+                    start_server1(ConfigData);
                 Errors ->
                     exit({eDaemonConfig, Errors})
             end;
